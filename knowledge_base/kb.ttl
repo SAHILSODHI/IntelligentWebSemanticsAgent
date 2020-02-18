@@ -1,0 +1,115 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix focu: <http://focu.io/schema#> .
+@prefix focudata: <http://focu.io/data#> .
+@prefix dbpedia: <http://dbpedia.org/page/>.
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+
+
+##################################       Classes       ##############################
+
+foaf:Person
+    a rdfs:Class .
+
+foaf:Organization
+    a rdfs:Class .
+
+focu:Student
+    a rdfs:Class ;
+    rdfs:subClassOf foaf:Person ;
+    rdfs:label "StudentClass"@en;
+    rdfs:comment "all the students"@en.
+
+
+focu:Course
+    a rdfs:Class ;
+    rdfs:label "University Courses"@en;
+    rdfs:comment "all the courses"@en.
+
+focu:Topic
+    a rdfs:Class ;
+    rdfs:label "Course Topic"@en;
+    rdfs:comment "all the topics"@en.
+
+focu:University
+    a rdfs:Class ;
+    rdfs:subClassOf foaf:Organization ;
+    rdfs:label "University"@en .
+
+focu:Course_Grade
+    a rdfs:Class ;
+    rdfs:label "Course and Grade"@en;
+    rdfs:comment "Class with a course and its respective grade"@en.
+##################################       Properties       ##############################
+
+focu:course_name
+    a rdf:Property ;
+    rdfs:label "Course Name"@en ;
+    rdfs:comment "A name given to the course" ;
+    rdfs:domain focu:Course ;
+    rdfs:range xsd:string .
+
+focu:course_subject
+    a rdf:Property ;
+    rdfs:label "Course Subject"@en ;
+    rdfs:comment "Subject of the course" ;
+    rdfs:domain focu:Course ;
+    rdfs:range xsd:string .
+
+focu:course_number
+    a rdf:Property ;
+    rdfs:label "Course Number"@en ;
+    rdfs:comment "Course code" ;
+    rdfs:domain focu:Course ;
+    rdfs:range xsd:integer .
+
+focu:course_description
+    a rdf:Property ;
+    rdfs:label "Course Description"@en ;
+    rdfs:comment "Description of the course" ;
+    rdfs:domain focu:Course ;
+    rdfs:range xsd:string .
+
+focu:id_number
+    a rdf:Property;
+    rdfs:label "ID Number"@en ;
+    rdfs:comment "ID of the Student" ;
+    rdfs:domain focu:Student ;
+    rdfs:range xsd:integer .
+
+focu:completed_course
+    a rdf:Property;
+    rdfs:label "completed courses"@en ;
+    rdfs:comment "The course completed by the student" ;
+    rdfs:domain focu:Student ;
+    rdfs:range focu:Course_Grade .
+
+#######################  Instances of the classes  ##########################
+
+focudata:Concordia
+    a focu:University ;
+    foaf:name "Concordia University"@en;
+    owl:SameAs dbpedia:ConcordiaUniversity .
+
+focudata:Intelligent_Systems
+    a focu:Course;
+    focu:course_name "Intelligent Systems"@en;
+    focu:course_subject "COMP";
+    focu:course_number "437"^^xsd:int;
+    focu:course_description "Computer Science subject"@en;
+    rdfs:SeeAlso dbpedia:Artificial_intelligence .
+
+focudata:Gursimran
+    a focu:Student;
+    foaf:firstName "Gursimran";
+    foaf:familyName "Singh";
+    foaf:id_number 40070000;
+    foaf:mbox "gursimran81@gmail.com";
+    focu:course_completed focudata:Intelligent_Systems .
+
+focudata:Expert_system
+    a focu:Topic;
+    foaf:name "Expert System";
+    rdfs:SeeAlso dbpedia:Expert_system .
