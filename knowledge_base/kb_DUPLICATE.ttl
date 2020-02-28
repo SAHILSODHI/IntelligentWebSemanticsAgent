@@ -1,0 +1,60 @@
+focudata:Gursimran
+    a focu:Student;
+    foaf:firstName "Gursimran";
+    foaf:familyName "Singh";
+    foaf:id_number 40070000;
+    foaf:mbox "gursimran81@gmail.com";
+    focu:graded_courses focudata:Algo_40070000, focudata:Intelligent_System_40070000 .
+
+focudata:Algo_40070000
+    a focu:Course ;
+    focu:Course focudata:Computer_Networks_and_Protocols;
+    focu:course_term "Summer 2019";
+    focu:course_grade "A+" .
+
+focudata:Intelligent_System_40070000
+    a focu:Course ;
+    focu:Course focudata:Computer_Networks_and_Protocols;
+    focu:course_term "Fall 2018" ;
+    focu:course_grade "F" .
+
+<http://focu.io/data#http://dbpedia.org/resource/Transmission_Control_Protocol> a focu:Topic ;
+    focu:containInverse <http://focu.io/data#Computer_Networks_and_Protocols> .
+
+
+
+
+
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+Prefix focu: <http://focu.io/schema#>
+PREFIX focudata: <http://focu.io/data#>
+PREFIX dbpedia: <http://dbpedia.org/resource/>
+SELECT ?studentName
+WHERE {
+   	 ?A focu:containInverse ?course .
+     ?studentSubjectID focu:Course ?course .
+     ?studentName focu:graded_courses ?studentSubjectID .
+     ?studentSubjectID focu:course_grade ?studentCourseGrade .
+     FILTER((?studentCourseGrade) != 'F') .
+     FILTER((?studentCourseGrade) != '') .
+} LIMIT 1
+
+
+focudata:Gursimran  a        focu:Student ;
+        focu:graded_courses  focudata:Algo_40070000 , focudata:Intelligent_System_40070000 ;
+        foaf:familyName      "Singh" ;
+        foaf:firstName       "Gursimran" ;
+        foaf:id_number       40070000 ;
+        foaf:mbox            "gursimran81@gmail.com" .
+
+focudata:Algo_40070000
+        a                  focu:Course ;
+        focu:Course        focudata:Computer_Networks_and_Protocols ;
+        focu:course_grade  "A+" ;
+        focu:course_term   "Summer 2019" .
+
+focudata:Intelligent_System_40070000
+        a                  focu:Course ;
+        focu:Course        focudata:Computer_Networks_and_Protocols ;
+        focu:course_grade  "F" ;
+        focu:course_term   "Fall 2018" .

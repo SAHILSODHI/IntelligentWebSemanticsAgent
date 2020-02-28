@@ -1,0 +1,48 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix focu: <http://focu.io/schema#> .
+@prefix focudata: <http://focu.io/data#> .
+@prefix dbpedia: <http://dbpedia.org/resource/>.
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+
+
+focu:Course
+    a rdfs:Class ;
+    rdfs:label "University Courses"@en;
+    rdfs:comment "all the courses"@en.
+
+focu:Topic
+    a rdfs:Class ;
+    rdfs:label "Course Topic"@en;
+    rdfs:comment "all the topics"@en.
+
+focu:contains
+    a rdf:Property;
+    rdfs:label "extracted topics"@en ;
+    rdfs:comment "Topics extracted from course description" ;
+    rdfs:domain focu:Course ;
+    rdfs:range focu:Topic .
+
+
+focudata:Intelligent_Systems
+    a focu:Course;
+    focu:course_name "Intelligent Systems"@en;
+    focu:course_subject "COMP";
+    focu:course_number "437"^^xsd:int;
+    focu:course_description "Computer Science subject"@en;
+    rdfs:SeeAlso dbpedia:Artificial_intelligence .
+
+focudata:Expert_system
+    a focu:Topic;
+    foaf:name "Expert System";
+    rdfs:SeeAlso dbpedia:Expert_system .
+
+focudata:Machine_Learning
+    a focu:Topic;
+    foaf:name "Expert System";
+    rdfs:SeeAlso dbpedia:Machine_learning .
+
+focudata:Intelligent_Systems focu:contains focudata:Expert_system .
+focudata:Intelligent_Systems focu:contains focudata:Machine_Learning .

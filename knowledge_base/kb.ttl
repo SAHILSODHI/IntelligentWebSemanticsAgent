@@ -4,7 +4,7 @@
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix focu: <http://focu.io/schema#> .
 @prefix focudata: <http://focu.io/data#> .
-@prefix dbpedia: <http://dbpedia.org/page/>.
+@prefix dbpedia: <http://dbpedia.org/resource/>.
 @prefix owl: <http://www.w3.org/2002/07/owl#>.
 
 
@@ -22,7 +22,6 @@ focu:Student
     rdfs:label "StudentClass"@en;
     rdfs:comment "all the students"@en.
 
-
 focu:Course
     a rdfs:Class ;
     rdfs:label "University Courses"@en;
@@ -38,11 +37,7 @@ focu:University
     rdfs:subClassOf foaf:Organization ;
     rdfs:label "University"@en .
 
-focu:Course_Grade
-    a rdfs:Class ;
-    rdfs:label "Course and Grade"@en;
-    rdfs:comment "Class with a course and its respective grade"@en.
-##################################       Properties       ##############################
+##################################     Properties       ##############################
 
 focu:course_name
     a rdf:Property ;
@@ -72,6 +67,20 @@ focu:course_description
     rdfs:domain focu:Course ;
     rdfs:range xsd:string .
 
+focu:course_term
+    a rdf:Property ;
+    rdfs:label "Course Description"@en ;
+    rdfs:comment "Description of the course" ;
+    rdfs:domain focu:Course ;
+    rdfs:range xsd:string .
+
+focu:course_grade
+    a rdf:Property ;
+    rdfs:label "Course Description"@en ;
+    rdfs:comment "Description of the course" ;
+    rdfs:domain focu:Course ;
+    rdfs:range xsd:string .
+
 focu:id_number
     a rdf:Property;
     rdfs:label "ID Number"@en ;
@@ -84,14 +93,36 @@ focu:completed_course
     rdfs:label "completed courses"@en ;
     rdfs:comment "The course completed by the student" ;
     rdfs:domain focu:Student ;
-    rdfs:range focu:Course_Grade .
+    rdfs:range focu:Course .
+
+focu:graded_courses
+    a rdf:Property;
+    rdfs:label "grade for course"@en ;
+    rdfs:comment "Course graded for a student" ;
+    rdfs:domain focu:Student ;
+    rdfs:range focu:Course .
+
+focu:contains
+    a rdf:Property;
+    rdfs:label "extracted topics"@en ;
+    rdfs:comment "Topics extracted from course description" ;
+    rdfs:domain focu:Course ;
+    rdfs:range focu:Topic .
+
+focu:containInverse
+    a rdf:Property;
+    rdfs:label "extracted courses"@en ;
+    rdfs:comment "Courses from topics" ;
+    rdfs:domain focu:Topic ;
+    rdfs:range focu:Course .
+
 
 #######################  Instances of the classes  ##########################
 
 focudata:Concordia
     a focu:University ;
     foaf:name "Concordia University"@en;
-    owl:SameAs dbpedia:ConcordiaUniversity .
+    owl:SameAs dbpedia:Concordia_University .
 
 focudata:Intelligent_Systems
     a focu:Course;
@@ -99,7 +130,18 @@ focudata:Intelligent_Systems
     focu:course_subject "COMP";
     focu:course_number "437"^^xsd:int;
     focu:course_description "Computer Science subject"@en;
-    rdfs:SeeAlso dbpedia:Artificial_intelligence .
+    rdfs:SeeAlso dbpedia:Artificial_intelligence ;
+    focu:contains focudata:Expert_system, focudata:Machine_Learning .
+
+focudata:Machine_Learning
+    a focu:Topic;
+    foaf:name "Machine Learning";
+    rdfs:SeeAlso dbpedia:Machine_learning ;
+    focu:containInverse focudata:Intelligent_Systems .
+
+#########################  COURSES WITH COMPLETED COURSES  ##############################
+
+########### Student 1 records. ##############
 
 focudata:Gursimran
     a focu:Student;
@@ -107,9 +149,63 @@ focudata:Gursimran
     foaf:familyName "Singh";
     foaf:id_number 40070000;
     foaf:mbox "gursimran81@gmail.com";
-    focu:course_completed focudata:Intelligent_Systems .
+    focu:graded_courses focudata:Algo_40070000, focudata:Intelligent_System_40070000 .
+
+focudata:Algo_40070000
+    a focu:Course ;
+    focu:Course focudata:http://dbpedia.org/resource/Transmission_Control_Protocol;
+    focu:course_term "Summer 2019";
+    focu:course_grade "A+" .
+
+focudata:Intelligent_System_40070000
+    a focu:Course ;
+    focu:Course focudata:http://dbpedia.org/resource/Transmission_Control_Protocol;
+    focu:course_term "Fall 2018" ;
+    focu:course_grade "F" .
 
 focudata:Expert_system
     a focu:Topic;
     foaf:name "Expert System";
-    rdfs:SeeAlso dbpedia:Expert_system .
+    rdfs:SeeAlso dbpedia:Expert_system ;
+    focu:containInverse focudata:http://dbpedia.org/resource/Transmission_Control_Protocol .
+
+focudata:Machine_Learning
+    a focu:Topic;
+    foaf:name "Expert System";
+    rdfs:SeeAlso dbpedia:Machine_learning ;
+    focu:containInverse focudata:http://dbpedia.org/resource/Transmission_Control_Protocol .
+
+
+########### Student 2 records. ##############
+
+focudata:Sahil
+    a focu:Student;
+    foaf:firstName "Sahil";
+    foaf:familyName "Singh";
+    foaf:id_number 40093437;
+    foaf:mbox "sahilsinghsodhi@gmail.com";
+    focu:graded_courses focudata:Algo_40093437, focudata:Intelligent_System_40093437 .
+
+focudata:Algo_40093437
+    a focu:Course ;
+    focu:Course focudata:http://dbpedia.org/resource/Transmission_Control_Protocol;
+    focu:course_term "Winter 2020";
+    focu:course_grade "B+".
+
+focudata:Intelligent_System_40093437
+    a focu:Course ;
+    focu:Course focudata:http://dbpedia.org/resource/Transmission_Control_Protocol;
+    focu:course_term "Winter 2020" ;
+    focu:course_grade "A-" .
+
+focudata:Expert_system
+    a focu:Topic;
+    foaf:name "Expert System";
+    rdfs:SeeAlso dbpedia:Expert_system ;
+    focu:containInverse focudata:http://dbpedia.org/resource/Transmission_Control_Protocol .
+
+focudata:Machine_Learning
+    a focu:Topic;
+    foaf:name "Machine Learning";
+    rdfs:SeeAlso dbpedia:Machine_learning ;
+    focu:containInverse focudata:http://dbpedia.org/resource/Transmission_Control_Protocol .
