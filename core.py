@@ -1,15 +1,24 @@
-from bs4 import BeautifulSoup
-import requests
-import pandas as pd
-from rdflib import Graph, Literal, Namespace
-import rdflib.namespace as RDFnamespace
-import urllib.parse
+import random
+import string
 import time
+import urllib.parse
+
+import pandas as pd
+import rdflib.namespace as RDFnamespace
+import requests
+from bs4 import BeautifulSoup
+from rdflib import Graph, Literal, Namespace
 
 focudata = Namespace("http://focu.io/data#")
 focu = Namespace("http://focu.io/schema#")
 dbo = Namespace("http://dbpedia.org/ontology/")
 dbpedia = Namespace("http://dbpedia.org/resource/")
+g = Graph()
+g.bind('focudata', focudata)
+g.bind('focu', focu)
+g.bind('dbo', dbo)
+g.bind('dbpedia', dbpedia)
+g.bind('foaf', RDFnamespace.FOAF)
 
 
 class core:
@@ -52,12 +61,6 @@ class core:
     def create_graph_schema(self):
         """Creating the basic schema of the graph. Adding the classes, properties and subclasses required
         for the university courses and students"""
-        g = Graph()
-        g.bind('focudata', focudata)
-        g.bind('focu', focu)
-        g.bind('dbo', dbo)
-        g.bind('dbpedia', dbpedia)
-        g.bind('foaf', RDFnamespace.FOAF)
 
         ##Classes
         # Person Class
@@ -175,10 +178,9 @@ class core:
         g.serialize(format='turtle', destination='knowledge_base/ab.ttl')
 
     def create_graph_from_csv(self):
-        """Creating rdf graph from the Dataset"""
+        """Creating rdf graph from the Dataset, DBpedia"""
 
         ##Defining the graph
-        g = Graph()
         g.parse('knowledge_base/ab.ttl', format='n3')
 
         ##Adding Courses to the Graph
@@ -189,14 +191,18 @@ class core:
         self.courseNumber = df['Course Number']
         for (course_num, course_subject, course_name, course_desc) in zip(self.courseNumber, self.courseSubject,
                                                                           self.courseName, self.courseDescription):
-            course_name_data = urllib.parse.quote_plus(course_name)
-            course_name_data = course_name_data.replace("+","_")
+            course_name_data = course_name.replace("+", "_")
+            course_name_data = course_name_data.replace(" ", "_")
+            course_name_data = course_name_data.replace("(*)", "")
+            course_name_data.translate(str.maketrans('', '', string.punctuation))
             g.add((focudata[course_name_data], RDFnamespace.RDF.type, focu.Course))
             g.add((focudata.term(course_name_data), focu.course_name, Literal(course_name)))
             g.add((focudata.term(course_name_data), focu.course_subject, Literal(course_subject)))
             g.add((focudata.term(course_name_data), focu.course_number, Literal(course_num)))
             g.add((focudata.term(course_name_data), focu.course_description, Literal(course_desc)))
             # g.add((focudata.term(course_name_data), RDFS.seeAlso, Literal('Nothing to see ')))
+
+            """Getting topics from DBpedia from course descriptions."""
             url = urllib.parse.quote(str(course_desc))
             url = 'https://api.dbpedia-spotlight.org/en/annotate?text=' + url
             responseCounter = 0
@@ -229,28 +235,58 @@ class core:
                 else:
                     time.sleep(1)
 
-        ###Adding Student information to the Graph
+        # making a ttl from the graph
+        g.serialize(destination='knowledge_base/ab.ttl', format='ttl')
+
+
+    def add_student_data_to_graph(self):
+        """Adding Student information to the Graph"""
+
+        #Course Data
+        df = pd.read_csv('dataset/courses.csv')
+        self.courseSubject = df['Course Subject']
+        self.courseName = df['Course Name']
+        self.courseDescription = df['Course Description']
+        self.courseNumber = df['Course Number']
+
+        #Student Data
         df_stu = pd.read_csv('dataset/student_dataset.csv')
         student_first_name = df_stu['Student First Name']
         student_last_name = df_stu['Student Last Name']
         student_ID = df_stu['ID Number']
         student_email = df_stu['Email']
-        some_courses_from_list = self.courseName[0:30]
 
-        for (student_first_name, student_last_name, student_ID, student_email, courses) in zip(student_first_name,
+        for (student_first_name, student_last_name, student_ID, student_email) in zip(student_first_name,
                                                                                                student_last_name,
                                                                                                student_ID,
-                                                                                               student_email,
-                                                                                               some_courses_from_list):
-            student_name = urllib.parse.quote_plus(student_first_name + " " + student_last_name)
-            course_name_data = urllib.parse.quote_plus(courses)
-            course_name_data = course_name_data.replace("+","_")
+                                                                                               student_email
+                                                                                               ):
+            student_name = urllib.parse.quote_plus(student_first_name + "_" + student_last_name)
+            grades = ["A+","A-","A","B+","B-","B","C","F"]
+            terms = ["Fall_2018","Summer_2018","Winter_2018","Fall_2019","Summer_2019","Winter_2019","Winter_2020"]
+            number_of_courses = random.randint(5, 15)
+
             g.add((focudata[student_name], RDFnamespace.RDF.type, focu.Student))
             g.add((focudata.term(student_name), RDFnamespace.FOAF.firstName, Literal(student_first_name)))
             g.add((focudata.term(student_name), RDFnamespace.FOAF.lastName, Literal(student_last_name)))
             g.add((focudata.term(student_name), focu.student_id, Literal(student_ID)))
             g.add((focudata.term(student_name), RDFnamespace.FOAF.mbox, Literal(student_email)))
-            g.add((focudata.term(student_name), focu.completed_course, focudata[course_name_data]))
 
-        # making a ttl from the graph
+            #sampling some number of courses from courselist
+            some_courses_from_list = random.sample(list(self.courseName), number_of_courses)
+            for course in some_courses_from_list:
+                course_name_data = course.replace("+", "_")
+                course_name_data = course_name_data.replace(" ", "_")
+                course_name_data = course_name_data.replace("(*)", "")
+                course_name_data.translate(str.maketrans('', '', string.punctuation))
+                graded_course_name = course_name_data.strip() + "_" + str(student_ID)
+                g.add((focudata.term(student_name), focu.graded_courses, focudata[graded_course_name.strip()]))
+
+                # Adding focudata for enrolled courses
+                g.add((focudata[graded_course_name], RDFnamespace.RDF.type, focu.Course))
+                g.add((focudata[graded_course_name], focu.Course, focudata[course_name_data]))
+                g.add((focudata[graded_course_name], focu.course_grade, Literal(random.choice(grades))))
+                g.add((focudata[graded_course_name], focu.course_term, Literal(random.choice(terms))))
+
         g.serialize(destination='knowledge_base/ab.ttl', format='ttl')
+
