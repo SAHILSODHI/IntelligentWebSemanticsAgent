@@ -7,7 +7,7 @@ import pandas as pd
 import rdflib.namespace as RDFnamespace
 import requests
 from bs4 import BeautifulSoup
-from rdflib import Graph, Literal, Namespace
+from rdflib import Graph, Literal, Namespace, URIRef
 
 focudata = Namespace("http://focu.io/data#")
 focu = Namespace("http://focu.io/schema#")
@@ -19,6 +19,7 @@ g.bind('focu', focu)
 g.bind('dbo', dbo)
 g.bind('dbpedia', dbpedia)
 g.bind('foaf', RDFnamespace.FOAF)
+g.bind('owl', RDFnamespace.OWL)
 
 
 class core:
@@ -31,27 +32,32 @@ class core:
         pass
 
     def get_course_html_to_csv(self):
-        URL = 'https://www.concordia.ca/academics/graduate/calendar/current/encs/computer-science-courses.html'
+        URL = 'http://www.concordia.ca/academics/graduate/calendar/current/fofa/dart-mdes.html'
         page = requests.get(URL)
         soup = BeautifulSoup(page.content, 'html.parser')
         results = soup.find_all(class_='wysiwyg parbase section')
         for i in range(0, len(results)):
             quoteTags = results[i].find_all('span', class_='large-text')
-            if i == 2:
+            if i == 4:
                 count = 0
                 for quoteTag in quoteTags:
                     if count > 1:
                         s = quoteTag.text.split("\n", 1)
-                        if len(s) > 1:
-                            self.courseDescription.append(s[1])
-                        else:
-                            self.courseDescription.append("Description not available")
+                        if quoteTag.find('b') is None:
+                            continue
                         course = quoteTag.find('b').text
                         x = course.split(' ', 2)
-                        self.courseSubject.append(x[0])
-                        x[1] = x[1][0:4]
-                        self.courseNumber.append(x[1])
-                        self.courseName.append(x[2])
+                        if len(x) >= 3:
+                            self.courseSubject.append(x[0])
+                            x[1] = x[1][0:4]
+                            self.courseNumber.append(x[1])
+                            self.courseName.append(x[2])
+                            if len(s) > 1:
+                                self.courseDescription.append(s[1])
+                            else:
+                                self.courseDescription.append("Description not available")
+                        else:
+                            continue
                     count = count + 1
         df = pd.DataFrame(
             {'Course Subject': self.courseSubject, 'Course Number': self.courseNumber, 'Course Name': self.courseName,
@@ -126,13 +132,6 @@ class core:
         g.add((focu.student_id, RDFnamespace.RDFS.domain, focu.Student))
         g.add((focu.student_id, RDFnamespace.RDFS.range, RDFnamespace.XSD.integer))
 
-        # Completed Courses
-        g.add((focu.completed_course, RDFnamespace.RDF.type, RDFnamespace.RDF.Property))
-        g.add((focu.completed_course, RDFnamespace.RDFS.label, Literal("Completed Courses by the Student")))
-        g.add((focu.completed_course, RDFnamespace.RDFS.comment, Literal("Completed Courses by the Student")))
-        g.add((focu.completed_course, RDFnamespace.RDFS.domain, focu.Student))
-        g.add((focu.completed_course, RDFnamespace.RDFS.range, focu.Course_Grade))
-
         # Graded Courses
         g.add((focu.graded_courses, RDFnamespace.RDF.type, RDFnamespace.RDF.Property))
         g.add((focu.graded_courses, RDFnamespace.RDFS.label, Literal("grade for course", lang="en")))
@@ -145,10 +144,10 @@ class core:
         g.add((focu.contains, RDFnamespace.RDFS.label, Literal("extracted topics", lang="en")))
         g.add((focu.contains, RDFnamespace.RDFS.comment, Literal("Topics extracted from course description")))
         g.add((focu.contains, RDFnamespace.RDFS.domain, focu.Course))
-        g.add((focu.contains, RDFnamespace.RDFS.range, RDFnamespace.XSD.string))
+        g.add((focu.contains, RDFnamespace.RDFS.range, focu.Topic))
 
         # Topics from Courses
-        g.add((focu.containInverse, RDFnamespace.RDF.type, RDFnamespace.RDF.Property))
+        g.add((focu.containInverse, RDFnamespace.OWL.inverseOf, focu.contains))
         g.add((focu.containInverse, RDFnamespace.RDFS.label, Literal("extracted courses", lang="en")))
         g.add((focu.containInverse, RDFnamespace.RDFS.comment, Literal("Courses extracted from Topics")))
         g.add((focu.containInverse, RDFnamespace.RDFS.domain, focu.Topic))
@@ -168,13 +167,6 @@ class core:
         g.add((focu.course_grade, RDFnamespace.RDFS.domain, focu.Course))
         g.add((focu.course_grade, RDFnamespace.RDFS.range, RDFnamespace.XSD.string))
 
-        # Student Identification
-        g.add((focu.id_number, RDFnamespace.RDF.type, RDFnamespace.RDF.Property))
-        g.add((focu.id_number, RDFnamespace.RDFS.label, Literal("Student Identification", lang="en")))
-        g.add((focu.id_number, RDFnamespace.RDFS.comment, Literal("Identification of the Student")))
-        g.add((focu.id_number, RDFnamespace.RDFS.domain, focu.Student))
-        g.add((focu.id_number, RDFnamespace.RDFS.range, RDFnamespace.XSD.integer))
-
         g.serialize(format='turtle', destination='knowledge_base/ab.ttl')
 
     def create_graph_from_csv(self):
@@ -184,7 +176,7 @@ class core:
         g.parse('knowledge_base/ab.ttl', format='n3')
 
         ##Adding Courses to the Graph
-        df = pd.read_csv('dataset/courses.csv')
+        df = pd.read_csv('dataset/cumulativeCoursesDataset.csv')
         self.courseSubject = df['Course Subject']
         self.courseName = df['Course Name']
         self.courseDescription = df['Course Description']
@@ -200,7 +192,8 @@ class core:
             g.add((focudata.term(course_name_data), focu.course_subject, Literal(course_subject)))
             g.add((focudata.term(course_name_data), focu.course_number, Literal(course_num)))
             g.add((focudata.term(course_name_data), focu.course_description, Literal(course_desc)))
-            # g.add((focudata.term(course_name_data), RDFS.seeAlso, Literal('Nothing to see ')))
+            g.add((focudata.term(course_name_data), RDFnamespace.RDFS.seeAlso, URIRef(
+                "https://www.concordia.ca/academics/graduate/calendar/current/encs/engineering-courses.html")))
 
             """Getting topics from DBpedia from course descriptions."""
             url = urllib.parse.quote(str(course_desc))
@@ -213,7 +206,7 @@ class core:
                     key = "Resources"
                     # data = response.json()
                     # print(json.dumps(data, indent=4))
-                    # print(course_desc)
+                    print(course_desc)
                     if key in data.keys():
                         resources = data["Resources"]
                         for res in resources:
@@ -222,16 +215,20 @@ class core:
                             else:
                                 topic = res["@URI"]
                                 englishName = res["@surfaceForm"]
-                                print(topic)
+                                topic = str(topic).replace("http://dbpedia.org/resource/", "")
+                                print(res["@URI"])
+                                # Adding topic to the course
                                 g.add((focudata.term(course_name_data), focu.contains, focudata[topic]))
+                                #Adding the topic information
                                 g.add((focudata[topic], RDFnamespace.RDF.type, focu.Topic))
                                 g.add((focudata[topic], focu.containInverse, focudata.term(course_name_data)))
                                 g.add((focudata[topic], RDFnamespace.FOAF.name, Literal(englishName)))
+                                g.add((focudata[topic], RDFnamespace.OWL.sameAs, dbpedia.term(topic)))
                     break
                 responseCounter = responseCounter + 1
                 print("Retrying..." + str(responseCounter) + " for : " + str(response))
                 if responseCounter == 3:
-                    time.sleep(5)
+                    time.sleep(1)
                 else:
                     time.sleep(1)
 
@@ -275,6 +272,7 @@ class core:
             #sampling some number of courses from courselist
             some_courses_from_list = random.sample(list(self.courseName), number_of_courses)
             for course in some_courses_from_list:
+                course = str(course)
                 course_name_data = course.replace("+", "_")
                 course_name_data = course_name_data.replace(" ", "_")
                 course_name_data = course_name_data.replace("(*)", "")
