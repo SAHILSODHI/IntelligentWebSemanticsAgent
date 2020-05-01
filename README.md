@@ -8,7 +8,7 @@ The data is retrieved using SPARQL.
 
 HOW TO RUN?
 
-Change directory to  IntelligentAgent_assginment1
+Change directory to  intelligentAgent
 
 The query.py is used to run the queries and generate the query txt files.
 
