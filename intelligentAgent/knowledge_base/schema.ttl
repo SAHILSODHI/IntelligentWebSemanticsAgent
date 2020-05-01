@@ -1,0 +1,92 @@
+@prefix dbo: <http://dbpedia.org/ontology/> .
+@prefix dbpedia: <http://dbpedia.org/resource/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix focu: <http://focu.io/schema#> .
+@prefix focudata: <http://focu.io/data#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+focu:Course a rdfs:Class ;
+    rdfs:label "University Courses" ;
+    rdfs:comment "This is a Course Class" .
+
+focu:Student a rdfs:Class ;
+    rdfs:label "StudentClass" ;
+    rdfs:comment "This is a Student Class" ;
+    rdfs:subClassOf foaf:Person .
+
+focu:Topic a rdfs:Class ;
+    rdfs:label "Course Topic" ;
+    rdfs:comment "Topic extracted for a given course" .
+
+focu:University a rdfs:Class ;
+    rdfs:label "Univeristy" ;
+    rdfs:subClassOf foaf:Organization .
+
+foaf:Organization a rdfs:Class .
+
+foaf:Person a rdfs:Class .
+
+focu:containInverse rdfs:label "extracted courses"@en ;
+    rdfs:comment "Courses extracted from Topics" ;
+    rdfs:domain focu:Topic ;
+    rdfs:range focu:Course ;
+    owl:inverseOf focu:contains .
+
+focu:course_description a rdf:Property ;
+    rdfs:label "Course Description" ;
+    rdfs:comment "Course Description" ;
+    rdfs:domain focu:Course ;
+    rdfs:range xsd:string .
+
+focu:course_grade a rdf:Property ;
+    rdfs:label "course grade"@en ;
+    rdfs:comment "The grade received for a course" ;
+    rdfs:domain focu:Course ;
+    rdfs:range xsd:string .
+
+focu:course_name a rdf:Property ;
+    rdfs:label "Course Name" ;
+    rdfs:comment "Course Name" ;
+    rdfs:domain focu:Course ;
+    rdfs:range xsd:string .
+
+focu:course_number a rdf:Property ;
+    rdfs:label "Course Number" ;
+    rdfs:comment "Course Number" ;
+    rdfs:domain focu:Course ;
+    rdfs:range xsd:integer .
+
+focu:course_subject a rdf:Property ;
+    rdfs:label "Course Subject" ;
+    rdfs:comment "Course Subject" ;
+    rdfs:domain focu:Course ;
+    rdfs:range xsd:string .
+
+focu:course_term a rdf:Property ;
+    rdfs:label "course term"@en ;
+    rdfs:comment "The term in which the given course was taken" ;
+    rdfs:domain focu:Course ;
+    rdfs:range xsd:string .
+
+focu:graded_courses a rdf:Property ;
+    rdfs:label "grade for course"@en ;
+    rdfs:comment "Course graded for a student" ;
+    rdfs:domain focu:Student ;
+    rdfs:range focu:Course .
+
+focu:student_id a rdf:Property ;
+    rdfs:label "Student ID" ;
+    rdfs:comment "Student ID" ;
+    rdfs:domain focu:Student ;
+    rdfs:range xsd:integer .
+
+focu:contains a rdf:Property ;
+    rdfs:label "extracted topics"@en ;
+    rdfs:comment "Topics extracted from course description" ;
+    rdfs:domain focu:Course ;
+    rdfs:range focu:Topic .
+

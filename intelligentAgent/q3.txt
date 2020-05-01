@@ -1,0 +1,11 @@
+
+                    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+                    Prefix focu: <http://focu.io/schema#>
+                    PREFIX focudata: <http://focu.io/data#>
+                    PREFIX owl: <http://www.w3.org/2002/07/owl#>
+                    SELECT DISTINCT (lcase(?t) as ?topicName) ?topicLink
+                    WHERE {
+                        focudata:Computer_Networks_and_Protocols focu:contains ?topic.
+                        ?topic owl:sameAs ?topicLink .
+                        ?topic foaf:name ?t
+                    }

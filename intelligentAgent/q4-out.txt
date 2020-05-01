@@ -1,0 +1,10 @@
+Course Name: Advanced_Pattern_Recognition_
+Course Grade: B-
+Course Name: Software_Re-engineering
+Course Grade: B-
+Course Name: Large-Scale_Optimization
+Course Grade: A
+Course Name: Geometric_Modelling
+Course Grade: A-
+Course Name: Statistical_Natural_Language_Processing
+Course Grade: A+

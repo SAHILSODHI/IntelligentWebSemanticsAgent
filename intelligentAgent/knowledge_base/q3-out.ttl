@@ -1,0 +1,28 @@
+Topic English Name: udp
+Topic Link: http://dbpedia.org/resource/User_Datagram_Protocol
+Topic English Name: error control
+Topic Link: http://dbpedia.org/resource/Error_detection_and_correction
+Topic English Name: error detection
+Topic Link: http://dbpedia.org/resource/Error_detection_and_correction
+Topic English Name: network security
+Topic Link: http://dbpedia.org/resource/Network_security
+Topic English Name: flow control
+Topic Link: http://dbpedia.org/resource/Control_flow
+Topic English Name: transmission control protocol
+Topic Link: http://dbpedia.org/resource/Transmission_Control_Protocol
+Topic English Name: tcp
+Topic Link: http://dbpedia.org/resource/Transmission_Control_Protocol
+Topic English Name: tcp/ip
+Topic Link: http://dbpedia.org/resource/Transmission_Control_Protocol
+Topic English Name: internet protocol
+Topic Link: http://dbpedia.org/resource/Internet_Protocol
+Topic English Name: protocol
+Topic Link: http://dbpedia.org/resource/Internet_Protocol
+Topic English Name: packet
+Topic Link: http://dbpedia.org/resource/Packet_switching
+Topic English Name: packet switching
+Topic Link: http://dbpedia.org/resource/Packet_switching
+Topic English Name: ipv6
+Topic Link: http://dbpedia.org/resource/IPv6
+Topic English Name: multicasting
+Topic Link: http://dbpedia.org/resource/Multicast

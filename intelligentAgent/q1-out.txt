@@ -1,0 +1,1 @@
+Total number of triples in the KB: 540

@@ -1,0 +1,17 @@
+
+                    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+                    Prefix focu: <http://focu.io/schema#>
+                    PREFIX focudata: <http://focu.io/data#>
+                    SELECT  DISTINCT (lcase(?topicName) as ?topicNames) 
+                    WHERE {
+                      focudata:Honorato_Mccarty focu:graded_courses ?courseNameWithID .
+                      ?courseNameWithID focu:Course ?courseName .
+                      ?courseNameWithID focu:course_grade ?courseGrade .
+                      ?topic a focu:Topic .
+                      ?topic focu:containInverse ?courseName .
+                      ?topic foaf:name ?t
+                      FILTER((?courseGrade) != '')
+                      FILTER((?courseGrade) != 'F')
+                      BIND(REPLACE(STR(?t),"-"," ") AS ?topicName)
+                    }
+                    

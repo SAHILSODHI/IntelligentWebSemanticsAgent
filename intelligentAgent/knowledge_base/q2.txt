@@ -1,0 +1,11 @@
+
+                    PREFIX focu: <http://focu.io/schema#>
+                    SELECT DISTINCT(count(?s) as ?NumberOfStudents) (count(?c) as ?NumberOfCourses) (count(?t) as ?NumberOfTopics)
+                    WHERE
+                    {
+                      {?c a focu:Course.}
+                      UNION
+                      {?s a focu:Student.}
+                      UNION
+                      {?t a focu:Topic.}
+                    }

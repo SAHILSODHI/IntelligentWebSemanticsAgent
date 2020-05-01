@@ -1,0 +1,11 @@
+
+                    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+                    Prefix focu: <http://focu.io/schema#>
+                    PREFIX focudata: <http://focu.io/data#>
+                    SELECT  ?courseName ?courseGrade
+                    WHERE {
+                        focudata:Akeem_Cotton focu:graded_courses ?course .
+                        ?course focu:Course ?courseName .
+                        ?course focu:course_grade ?courseGrade .
+                        FILTER((?courseGrade) != '') .
+                    }

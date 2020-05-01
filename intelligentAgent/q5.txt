@@ -1,0 +1,15 @@
+
+                    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+                    Prefix focu: <http://focu.io/schema#>
+                    PREFIX focudata: <http://focu.io/data#>
+                    PREFIX dbpedia: <http://dbpedia.org/resource/>
+                    SELECT ?studentName
+                    WHERE {
+                      focudata:Graph_theory focu:containInverse ?course .
+                      ?studentSubjectID focu:Course ?course .
+                      ?studentName focu:graded_courses ?studentSubjectID .
+                      ?studentSubjectID focu:course_grade ?studentCourseGrade .
+                      FILTER((?studentCourseGrade) != 'F') .
+                      FILTER((?studentCourseGrade) != '') .
+                    }
+                    
