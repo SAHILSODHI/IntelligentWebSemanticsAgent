@@ -1,4 +1,4 @@
-# IntelligentAgent
+# University Based Chatbot
 Building an Intelligent Agent using Web Semantics and Knowledge Graphs.
 This project is aimed at building an intelligent agent. The knowledge graph is made using Concordia university courses and fake student database.
 The data is retrieved using SPARQL.
