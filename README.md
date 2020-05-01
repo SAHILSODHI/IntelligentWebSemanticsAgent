@@ -3,8 +3,8 @@ Building an Intelligent Agent using Web Semantics and Knowledge Graphs.
 This project is aimed at building an intelligent agent. The knowledge graph is made using Concordia university courses and fake student database.
 The data is retrieved using SPARQL.
 
-40080981 Gursimran Singh
-40093437 Sahil Singh Sodhi 
+40093437 Sahil Singh Sodhi
+40080981 Gursimran Singh 
 
 HOW TO RUN?
 
